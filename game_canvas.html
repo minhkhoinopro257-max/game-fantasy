@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { margin: 0; background-color: #0f0e17; color: #fffffe; font-family: monospace; }
+    #canvas-container { text-align: center; margin-top: 10px; }
+    canvas { border: 3px solid #ff8906; border-radius: 8px; box-shadow: 0 0 15px rgba(255,137,6,0.5); }
+  </style>
+</head>
+<body>
+  <div id="canvas-container">
+    <canvas id="gameCanvas" width="600" height="270"></canvas>
+  </div>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const params = new URLSearchParams(window.location.search);
+    const stage = parseInt(params.get('stage')) || 1;
+    const playerHp = parseInt(params.get('php')) || 10;
+    const bossHp = parseInt(params.get('bhp')) || 3;
+    const maxBossHp = parseInt(params.get('max_bhp')) || 3;
+    const lastResult = params.get('result') || 'none';
+
+    const bossNames = ["1. Sát Thủ Áo Đen", "2. Phù Thủy Xương", "3. Nữ Hoàng Bóng Tối"];
+
+    // Load đúng tên file ảnh bạn đã tải lên GitHub
+    const playerImg = new Image(); 
+    playerImg.src = "nhân vật chính.jpg";
+    
+    const bossImgs = [new Image(), new Image(), new Image()];
+    bossImgs[0].src = "boss 1.jpg";
+    bossImgs[1].src = "boss 2.jpg";
+    bossImgs[2].src = "boss 3.jpg";
+
+    let pCols = 5, pRows = 4;
+    let pFrameW = 0, pFrameH = 0;
+    let frameIdx = 0;
+
+    Promise.all([
+      new Promise(resolve => { playerImg.onload = resolve; }),
+      new Promise(resolve => { bossImgs[0].onload = resolve; }),
+      new Promise(resolve => { bossImgs[1].onload = resolve; }),
+      new Promise(resolve => { bossImgs[2].onload = resolve; })
+    ]).then(() => {
+      pFrameW = playerImg.width / pCols;
+      pFrameH = playerImg.height / pRows;
+      setInterval(drawGame, 130);
+    });
+
+    function drawBackground() {
+      if (stage === 1) {
+        // Màn 1: Ngục tối
+        ctx.fillStyle = "#121212"; ctx.fillRect(0, 0, 600, 270);
+        ctx.fillStyle = "#2c2c2c";
+        for(let i=0; i<600; i+=40) { ctx.fillRect(i, 0, 38, 210); }
+        ctx.fillStyle = "#1f1f1f"; ctx.fillRect(0, 210, 600, 60);
+      } else if (stage === 2) {
+        // Màn 2: Hang động lửa
+        let grad = ctx.createLinearGradient(0, 0, 0, 270);
+        grad.addColorStop(0, "#3d0c11"); grad.addColorStop(1, "#1a0507");
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, 600, 270);
+        ctx.fillStyle = "#ff4500"; ctx.fillRect(0, 225, 600, 45);
+        ctx.fillStyle = "#ff8c00"; ctx.fillRect(0, 215, 600, 10);
+      } else {
+        // Màn 3: Lâu đài / Ngai vàng Nữ Hoàng
+        let grad = ctx.createLinearGradient(0, 0, 0, 270);
+        grad.addColorStop(0, "#2b1055"); grad.addColorStop(1, "#7597de");
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, 600, 270);
+        ctx.fillStyle = "#1b0c3f"; ctx.fillRect(0, 210, 600, 60);
+      }
+      ctx.strokeStyle = "#ff8906"; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(0, 210); ctx.lineTo(600, 210); ctx.stroke();
+    }
+
+    function drawGame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawBackground();
+
+      // 1. Vẽ Player
+      if (playerImg.complete && pFrameW > 0) {
+        let pRow = 0;
+        if (lastResult === 'correct') pRow = 2; 
+        else if (lastResult === 'wrong') pRow = 1; 
+
+        let srcX = (frameIdx % pCols) * pFrameW;
+        let srcY = pRow * pFrameH;
+        let pX = 80;
+        if (lastResult === 'correct') pX += 40;
+
+        ctx.drawImage(playerImg, srcX, srcY, pFrameW, pFrameH, pX, 130, 50, 75);
+        frameIdx++;
+      }
+
+      // 2. Vẽ Boss tương ứng
+      let currentBossImg = bossImgs[stage - 1];
+      if (currentBossImg.complete) {
+        let bX = 450, bY = 115;
+
+        if (lastResult === 'wrong') {
+          if (stage === 1) bX -= 35;
+          if (stage === 2) {
+            ctx.fillStyle = "#ff6b6b"; ctx.beginPath(); ctx.arc(380, 150, 18, 0, Math.PI*2); ctx.fill();
+            ctx.fillStyle = "#ffa502"; ctx.beginPath(); ctx.arc(375, 150, 10, 0, Math.PI*2); ctx.fill();
+          }
+          if (stage === 3) {
+            ctx.strokeStyle = "#f1c40f"; ctx.lineWidth = 4;
+            ctx.beginPath(); ctx.moveTo(100, 0); ctx.lineTo(90, 80); ctx.lineTo(110, 120); ctx.lineTo(95, 210); ctx.stroke();
+          }
+        }
+
+        // Màn 3: Trả lời đúng gọi Boss 1 và Boss 2 lên đánh Nữ Hoàng
+        if (stage === 3 && lastResult === 'correct') {
+          if (bossImgs[0].complete) ctx.drawImage(bossImgs[0], 320, 130, 45, 75);
+          if (bossImgs[1].complete) ctx.drawImage(bossImgs[1], 375, 125, 45, 75);
+        }
+
+        ctx.drawImage(currentBossImg, bX, bY, 65, 90);
+      }
+
+      // 3. Thanh hiển thị máu
+      ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(15, 12, 185, 26);
+      ctx.strokeStyle = "#e53170"; ctx.lineWidth = 2; ctx.strokeRect(15, 12, 185, 26);
+      ctx.fillStyle = "#fffffe"; ctx.font = "bold 11px sans-serif";
+      ctx.fillText(`Hiệp Sĩ: ${playerHp}/10 HP`, 22, 29);
+
+      ctx.fillStyle = "rgba(0,0,0,0.6)"; ctx.fillRect(395, 12, 190, 26);
+      ctx.strokeStyle = "#ff8906"; ctx.lineWidth = 2; ctx.strokeRect(395, 12, 190, 26);
+      ctx.fillText(`${bossNames[stage - 1]}: ${bossHp}/${maxBossHp} HP`, 402, 29);
+    }
+  </script>
+</body>
+</html>
