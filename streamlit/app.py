@@ -77,3 +77,166 @@ if st.button("⚔️ Tung đòn giải toán!"):
     else:
         st.session_state.q_idx = (st.session_state.q_idx + 1) % len(QUESTIONS[st.session_state.stage])
     st.rerun()
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      margin: 0;
+      background-color: #0b091a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+    canvas {
+      border: 4px solid #ff8906;
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(255, 137, 6, 0.4);
+      background: #12121a;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameWorld" width="700" height="350"></canvas>
+  <script>
+    const canvas = document.getElementById('gameWorld');
+    const ctx = canvas.getContext('2d');
+
+    const params = new URLSearchParams(window.location.search);
+    const stage = parseInt(params.get('stage')) || 1;
+    const playerHp = parseInt(params.get('php')) || 10;
+    const bossHp = parseInt(params.get('bhp')) || 3;
+    const maxBossHp = parseInt(params.get('max_bhp')) || 3;
+    const actionState = params.get('result') || 'idle'; // 'idle', 'player_attack', 'boss_attack'
+
+    const bossNames = ["1. Sát Thủ Áo Đen", "2. Phù Thủy Xương", "3. Nữ Hoàng Bóng Tối"];
+
+    // Load hình ảnh nhân vật & boss từ GitHub repo
+    const playerImg = new Image(); playerImg.src = "nhân vật chính.jpg";
+    const bossImgs = [new Image(), new Image(), new Image()];
+    bossImgs[0].src = "boss 1.jpg";
+    bossImgs[1].src = "boss 2.jpg";
+    bossImgs[2].src = "boss 3.jpg";
+
+    let pCols = 5, pRows = 4;
+    let pFrameW = 0, pFrameH = 0;
+    let animFrame = 0;
+
+    Promise.all([
+      new Promise(res => playerImg.onload = res),
+      new Promise(res => bossImgs[0].onload = res),
+      new Promise(res => bossImgs[1].onload = res),
+      new Promise(res => bossImgs[2].onload = res)
+    ]).then(() => {
+      pFrameW = playerImg.width / pCols;
+      pFrameH = playerImg.height / pRows;
+      setInterval(renderWorld, 100);
+    });
+
+    // Vẽ thế giới 2D theo bối cảnh từng màn
+    fnMapBackground = () => {
+      if (stage === 1) {
+        // Màn 1: Khu rừng / Ngục tối u tối
+        ctx.fillStyle = "#161622"; ctx.fillRect(0, 0, 700, 350);
+        ctx.fillStyle = "#1e1e2f"; // Các trụ đá background
+        ctx.fillRect(80, 50, 40, 220); ctx.fillRect(550, 50, 50, 220);
+        ctx.fillStyle = "#0f0f14"; ctx.fillRect(0, 270, 700, 80); // Sàn đất
+      } else if (stage === 2) {
+        // Màn 2: Hang động nham thạch lửa
+        let grad = ctx.createLinearGradient(0, 0, 0, 350);
+        grad.addColorStop(0, "#2c0b0e"); grad.addColorStop(1, "#120304");
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, 700, 350);
+        // Nham thạch chảy bên dưới
+        ctx.fillStyle = "#ff3800"; ctx.fillRect(0, 310, 700, 40);
+        ctx.fillStyle = "#ffa200"; ctx.fillRect(0, 300, 700, 10);
+        ctx.fillStyle = "#1a0505"; ctx.fillRect(0, 270, 700, 35); // Sàn đá hang
+      } else {
+        // Màn 3: Lâu đài bầu trời của Nữ Hoàng
+        let grad = ctx.createLinearGradient(0, 0, 0, 350);
+        grad.addColorStop(0, "#1f1035"); grad.addColorStop(1, "#43285c");
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, 700, 350);
+        // Cột cẩm thạch hoàng gia
+        ctx.fillStyle = "#2d1647"; ctx.fillRect(100, 30, 30, 240); ctx.fillRect(570, 30, 30, 240);
+        ctx.fillStyle = "#140a21"; ctx.fillRect(0, 270, 700, 80); // Sàn hoa cương
+      }
+      // Đường ranh giới sàn 2D
+      ctx.strokeStyle = "#ff8906"; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(0, 270); ctx.lineTo(700, 270); ctx.stroke();
+    }
+
+    function renderWorld() {
+      ctx.clearRect(0, 0, 700, 350);
+      fnMapBackground();
+
+      // Tọa độ 2D của nhân vật & boss
+      let pX = 120, pY = 180;
+      let bX = 500, bY = 165;
+
+      // Xử lý hiệu ứng hành động trong thế giới 2D
+      if (actionState === 'player_attack') {
+        pX += 60; // Nhân vật lao lên tấn công
+        if (stage === 1) {
+          // Hiệu ứng đấm / chém cận chiến
+          ctx.fillStyle = "#00ffff"; ctx.beginPath(); ctx.arc(pX + 50, pY + 30, 25, 0, Math.PI*2); ctx.fill();
+        } else if (stage === 2) {
+          // Hiệu ứng chưởng nước bay về phía boss
+          ctx.fillStyle = "#00b4d8"; ctx.beginPath(); ctx.arc(pX + 80, pY + 30, 15, 0, Math.PI*2); ctx.fill();
+          ctx.fillStyle = "#90e0ef"; ctx.beginPath(); ctx.arc(pX + 90, pY + 30, 8, 0, Math.PI*2); ctx.fill();
+        } else if (stage === 3) {
+          // Triệu hồi Boss 1 & Boss 2 lên đánh Nữ Hoàng
+          if (bossImgs[0].complete) ctx.drawImage(bossImgs[0], 380, 175, 55, 90);
+          if (bossImgs[1].complete) ctx.drawImage(bossImgs[1], 435, 170, 55, 90);
+        }
+      } else if (actionState === 'boss_attack') {
+        if (stage === 1) {
+          bX -= 40; // Sát thủ lao tới chém nhân vật
+        } else if (stage === 2) {
+          // Phù thủy xương tung cầu lửa bay vào nhân vật
+          ctx.fillStyle = "#ff4800"; ctx.beginPath(); ctx.arc(320, 200, 20, 0, Math.PI*2); ctx.fill();
+          ctx.fillStyle = "#ffdd00"; ctx.beginPath(); ctx.arc(315, 200, 10, 0, Math.PI*2); ctx.fill();
+        } else if (stage === 3) {
+          // Nữ hoàng triệu hồi sét giáng từ trên trời xuống nhân vật
+          ctx.strokeStyle = "#ffff00"; ctx.lineWidth = 5;
+          ctx.beginPath(); ctx.moveTo(150, 0); ctx.lineTo(135, 120); ctx.lineTo(160, 190); ctx.lineTo(145, 270); ctx.stroke();
+        }
+      }
+
+      // 1. Vẽ Nhân vật chính (Player 2D)
+      if (playerImg.complete && pFrameW > 0) {
+        let pRow = 0; // Đứng yên
+        if (actionState === 'player_attack') pRow = 2; // Động tác đánh
+        else if (actionState === 'boss_attack') pRow = 1; // Bị tấn công / né
+
+        let srcX = (animFrame % pCols) * pFrameW;
+        let srcY = pRow * pFrameH;
+        ctx.drawImage(playerImg, srcX, srcY, pFrameW, pFrameH, pX, pY, 60, 90);
+        animFrame++;
+      }
+
+      // 2. Vẽ Boss 2D tương ứng màn
+      let currentBoss = bossImgs[stage - 1];
+      if (currentBoss.complete) {
+        ctx.drawImage(currentBoss, bX, bY, 75, 105);
+      }
+
+      // 3. Giao diện HUD Thanh Máu RPG 2D trên màn hình game
+      // HP Player (10 máu)
+      ctx.fillStyle = "rgba(0,0,0,0.7)"; ctx.fillRect(20, 15, 200, 30);
+      ctx.strokeStyle = "#ff8906"; ctx.lineWidth = 2; ctx.strokeRect(20, 15, 200, 30);
+      ctx.fillStyle = "#ff4d4d"; ctx.fillRect(25, 20, (playerHp / 10) * 190, 20);
+      ctx.fillStyle = "#ffffff"; ctx.font = "bold 13px monospace";
+      ctx.fillText(`Hiệp Sĩ: ${playerHp}/10 HP`, 40, 32);
+
+      // HP Boss (Biến động theo từng màn: 3, 5, 7 máu)
+      ctx.fillStyle = "rgba(0,0,0,0.7)"; ctx.fillRect(480, 15, 200, 30);
+      ctx.strokeStyle = "#e53170"; ctx.lineWidth = 2; ctx.strokeRect(480, 15, 200, 30);
+      ctx.fillStyle = "#00ff88"; ctx.fillRect(485, 20, (bossHp / maxBossHp) * 190, 20);
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(`${bossNames[stage - 1]}: ${bossHp}/${maxBossHp}`, 495, 32);
+    }
+  </script>
+</body>
+</html>
