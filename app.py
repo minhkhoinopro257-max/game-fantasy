@@ -420,7 +420,7 @@ with st.form(key=f"form_q_{current_q['id']}"):
                         st.session_state.victory = True
             else:
                 st.session_state.hero_hp -= 25
-                st.session_state.combat_log = f"🛡️ CHệch MỤC TIÊU! {current_stage['boss_name']} phản đòn khiến bạn mất 25 HP! Hãy xem lời giải bên dưới và thử lại!"
+                st.session_state.combat_log = f"🛡️ CHỆCH MỤC TIÊU! {current_stage['boss_name']} phản đòn khiến bạn mất 25 HP! Hãy xem lời giải bên dưới và thử lại!"
                 if st.session_state.hero_hp <= 0:
                     st.session_state.game_over = True
             
