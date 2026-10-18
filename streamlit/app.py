@@ -515,7 +515,7 @@ if st.button("⚔️ Tung đòn giải toán!"):
       display: flex;
       justify-content: center;
       align-items: center;
-     st.markdown(
+   st.markdown(
     """
     <style>
         .some-class {
@@ -525,10 +525,6 @@ if st.button("⚔️ Tung đòn giải toán!"):
     """,
     unsafe_allow_html=True
 )
-      overflow: hidden;
-    }
-    canvas {
-      border: 4px solid #ff8906;
       border-radius: 12px;
       box-shadow: 0 0 25px rgba(255, 137, 6, 0.4);
       background: #12121a;
