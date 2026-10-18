@@ -2,7 +2,7 @@ import streamlit as st
 
 # Cấu hình trang
 st.set_page_config(
-    page_title="Dũng Sĩ Toán Học - Đánh Boss LTV",
+    page_title="Dũng Sĩ Toán Học - Đánh Boss toán học ",
     page_icon="⚔️",
     layout="centered"
 )
