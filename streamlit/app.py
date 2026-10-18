@@ -515,7 +515,16 @@ if st.button("⚔️ Tung đòn giải toán!"):
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+     st.markdown(
+    """
+    <style>
+        .some-class {
+            height: 100vh;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
       overflow: hidden;
     }
     canvas {
