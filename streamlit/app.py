@@ -4,7 +4,7 @@ import os
 
 # Cấu hình trang
 st.set_page_config(
-    page_title="Hiệp Sĩ Giải Cứu Rồng - Toán 9 & Ôn Thi 10",
+    page_title="Main  - Toán 9 & Ôn Thi 10",
     page_icon="🐉",
     layout="centered"
 )
@@ -184,7 +184,7 @@ STAGES = {
     1: {
         "name": "Màn 1: Tàn Tích Rừng Đen (Cơ bản)",
         "story": "Hiệp sĩ tiến vào khu rừng âm u để tìm đường đến lâu đài giải cứu Rồng thần. Tên Sát Thủ Áo Đen bất ngờ chặn đường!",
-        "boss_name": "Sát Thủ Áo Đen",
+        "boss_name": "Killer ",
         "boss_files": ["boss1.png", "boss1.jpg", "image_b09486.png"],
         "boss_fallback": "🥷",
         "bg_files": ["bg1.jpg", "bg1.png", "image_b0955a.jpg"],
