@@ -725,24 +725,25 @@ if st.button("⚡ Tiến Lên & Vung Kiếm Chém Boss!", type="primary"):
 hero_b64 = get_base64_image("main.png")
 
 # Đưa biến hero_b64 vào thuộc tính src của thẻ img trong html_code
-html_code = f"""
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="utf-8">
+import base64
+import os
+import streamlit as st
+import streamlit.components.v1 as components
+
+# Chuỗi HTML bạn vừa cung cấp
+html_code = """
+<div class="actor-container" style="animation: heroEnter_1 1.4s forwards ease-out;">
+    <div class="actor-label">Hiệp Sĩ</div>
+    <!-- Thay đoạn base64 dài bằng biến ảnh của bạn nếu cần -->
+    <div style="font-size: 60px;">🤺</div>
+</div>
+
 <style>
-    body {{
-        margin: 0;
-        background: transparent;
-        overflow: hidden;
-    }}
-    .actor-container {{
-        position: relative;
-        display: inline-block;
-        text-align: center;
-        animation: heroEnter_1 1.4s forwards ease-out;
-    }}
-    .actor-label {{
+    @keyframes heroEnter_1 {
+        0% { transform: translateX(-40px); opacity: 0; }
+        100% { transform: translateX(0px); opacity: 1; }
+    }
+    .actor-label {
         background: rgba(0,0,0,0.78);
         color: #ffd700;
         font-size: 11px;
@@ -751,30 +752,10 @@ html_code = f"""
         border-radius: 6px;
         border: 1px solid #ffd700;
         margin-bottom: 3px;
-        white-space: nowrap;
-    }}
-    .sprite-img {{
-        height: 115px;
-        width: auto;
-        object-fit: contain;
-        filter: drop-shadow(0 5px 8px rgba(0,0,0,0.9));
-    }}
-
-    @keyframes heroEnter_1 {{
-        0% {{ transform: translateX(-40px); opacity: 0; }}
-        100% {{ transform: translateX(0px); opacity: 1; }}
-    }}
+        display: inline-block;
+    }
 </style>
-</head>
-<body>
-
-<div class="actor-container">
-    <div class="actor-label">Hiệp Sĩ</div>
-    <img src="{hero_b64}" class="sprite-img" alt="Hiệp Sĩ" />
-</div>
-
-</body>
-</html>
 """
 
-components.html(html_code, height=200)
+st.title("Test Hiệu Ứng Nhân Vật")
+components.html(html_code, height=150)
