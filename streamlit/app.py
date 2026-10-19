@@ -147,4 +147,5 @@ st.markdown("""
     animation: rushLeft 0.8s infinite alternate ease-in-out;
 }
 @keyframes rushRight {
-    0% { transform: translateX(-
+    0% { transform: translateX(-25px); }
+    100% { transform: translateX(10
