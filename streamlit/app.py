@@ -2,21 +2,21 @@ import streamlit as st
 import base64
 import os
 
-# Cấu hình trang
+# Page configuration
 st.set_page_config(
-    page_title="Hiệp Sĩ Giải Cứu Rồng - Toán 9 & Ôn Thi 10",
+    page_title="Dragon Rescue Knight - Math 9 & High School Entrance Exam Prep",
     page_icon="🐉",
     layout="centered"
 )
 
-# Hàm tự động tải lại trang tương thích mọi phiên bản Streamlit
+# Function to safely rerun Streamlit app across versions
 def safe_rerun():
     if hasattr(st, "rerun"):
         st.rerun()
     else:
         st.experimental_rerun()
 
-# Hàm đọc file ảnh sang Base64 để nhúng trực tiếp vào đồ họa 2D CSS
+# Function to encode image to base64 for CSS 2D rendering
 def get_image_base64(file_candidates):
     for filename in file_candidates:
         if os.path.exists(filename):
@@ -33,7 +33,7 @@ def render_sprite_html(file_candidates, fallback_emoji, extra_class=""):
         return f'<img src="{b64}" class="pixel-sprite {extra_class}">'
     return f'<div class="emoji-sprite {extra_class}">{fallback_emoji}</div>'
 
-# ================= CSS ĐỒ HỌA 2D & HIỆU ỨNG HOẠT HỌA =================
+# ================= CSS 2D GRAPHICS & ANIMATIONS =================
 st.markdown("""
 <style>
 .battle-arena {
@@ -93,7 +93,7 @@ st.markdown("""
     animation: float 2s infinite ease-in-out;
 }
 .vs-badge {
-    font-size: 30px;
+    font-size: 32px;
     font-weight: 900;
     color: #ff3b3b;
     text-shadow: 0 0 12px #ff0000, 2px 2px 2px #000;
@@ -124,13 +124,11 @@ st.markdown("""
     margin-bottom: 12px;
 }
 
-/* Hoạt họa nhân vật nhấp nhô */
 @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-8px); }
 }
 
-/* Hoạt họa Game Over: Lính canh lao vào đánh gục Hiệp Sĩ */
 .dead-knight {
     transform: rotate(-90deg) scale(0.85) !important;
     filter: grayscale(100%) brightness(60%);
@@ -155,7 +153,6 @@ st.markdown("""
     100% { transform: translateX(-10px) rotate(-15deg); }
 }
 
-/* Hoạt họa Phá Đảo: Công chúa bị đánh bay & Rồng bay đi */
 .princess-blast-off {
     animation: blastOff 3.5s forwards ease-in !important;
 }
@@ -177,14 +174,14 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ================= DỮ LIỆU 3 MÀN CHƠI & 15 CÂU HỎI =================
+# ================= 3 STAGES & 15 QUESTIONS DATA =================
 HERO_FILES = ["main.png", "main.jpg", "image_b090fc.png"]
 
 STAGES = {
     1: {
-        "name": "Màn 1: Tàn Tích Rừng Đen (Cơ bản)",
-        "story": "Hiệp sĩ tiến vào khu rừng âm u để tìm đường đến lâu đài giải cứu Rồng thần. Tên Sát Thủ Áo Đen bất ngờ chặn đường!",
-        "boss_name": "Sát Thủ Áo Đen",
+        "name": "Stage 1: Dark Forest Ruins (Basic)",
+        "story": "Killer suddenly blocks your path!",
+        "boss_name": "Killer",
         "boss_files": ["boss1.png", "boss1.jpg", "image_b09486.png"],
         "boss_fallback": "🥷",
         "bg_files": ["bg1.jpg", "bg1.png", "image_b0955a.jpg"],
@@ -248,9 +245,9 @@ STAGES = {
         ]
     },
     2: {
-        "name": "Màn 2: Cổng Lâu Đài Giam Rồng (Tuyển sinh 10)",
-        "story": "Rồng thần đang bị xích trên đỉnh tháp lâu đài! Để tiến vào trong, Hiệp sĩ phải vượt qua Tử Thần Lửa Đỏ canh cổng!",
-        "boss_name": "Tử Thần Lửa Đỏ",
+        "name": "Stage 2: Dragon Castle Gate (Entrance Exam 10)",
+        "story": "The Dragon God is chained atop the castle tower! To enter, Main must defeat Fire Reaper guarding the gate!",
+        "boss_name": "Fire Reaper",
         "boss_files": ["boss2.png", "boss2.jpg", "image_b094c4.png"],
         "boss_fallback": "💀🔥",
         "bg_files": ["bg2.png", "bg2.jpg", "image_b0e738.png"],
@@ -319,9 +316,9 @@ STAGES = {
         ]
     },
     3: {
-        "name": "Màn 3: Đại Sảnh Ngai Vàng (Toán Chuyên LTV)",
-        "story": "Giữa đại sảnh uy nghiêm đầy lính gác, Công Chúa Độc Ác đang nắm giữ chìa khóa giam cầm Rồng thần. Chỉ một sai lầm nhỏ, lính canh sẽ kết liễu bạn!",
-        "boss_name": "Công Chúa Độc Ác",
+        "name": "Stage 3: Throne Hall (Advanced Math LTV)",
+        "story": "Inside the majestic hall full of guards, Evil Princess holds the key to the Dragon. One mistake and guards will end you!",
+        "boss_name": "Evil Princess",
         "boss_files": ["boss3.jpg", "boss3.png", "image_b0951d.jpg"],
         "boss_fallback": "👸👑",
         "bg_files": ["bg3.jpg", "bg3.png", "image_b0e7d3.jpg"],
@@ -401,14 +398,14 @@ STAGES = {
     }
 }
 
-# ================= KHỞI TẠO SESSION STATE =================
+# ================= INITIALIZE SESSION STATE =================
 if "stage" not in st.session_state:
     st.session_state.stage = 1
     st.session_state.q_index = 0
     st.session_state.hero_hp = 100
     st.session_state.boss_hp = 100
     st.session_state.score = 0
-    st.session_state.combat_log = "⚔️ Hành trình giải cứu Rồng bắt đầu! Cẩn thận: Trả lời sai 1 câu sẽ bị lính canh đánh chết ngay lập tức!"
+    st.session_state.combat_log = "⚔️ The journey to rescue the Dragon begins! Careful: 1 wrong answer means instant death!"
     st.session_state.last_explanation = None
     st.session_state.game_over = False
     st.session_state.victory = False
@@ -419,19 +416,19 @@ def restart_game():
     st.session_state.hero_hp = 100
     st.session_state.boss_hp = 100
     st.session_state.score = 0
-    st.session_state.combat_log = "⚔️ Hiệp sĩ đã hồi sinh! Hãy giải cứu Rồng thần khỏi Công Chúa Độc Ác!"
+    st.session_state.combat_log = "⚔️ Main has revived! Rescue the Dragon God from Evil Princess!"
     st.session_state.last_explanation = None
     st.session_state.game_over = False
     st.session_state.victory = False
 
-# ================= GIAO DIỆN CHÍNH =================
-st.title("🐉 Hiệp Sĩ Giải Cứu Rồng Khỏi Công Chúa Độc Ác")
+# ================= MAIN INTERFACE =================
+st.title("🐉 Knight Rescues Dragon From Evil Princess")
 
 current_stage = STAGES[st.session_state.stage]
 bg_b64 = get_image_base64(current_stage["bg_files"])
 bg_style = f"background-image: url('{bg_b64}');" if bg_b64 else f"background: {current_stage['bg_fallback_gradient']};"
 
-# ---------------- MÀN HÌNH CHIẾN THẮNG (CUTSCENE PHÁ ĐẢO) ----------------
+# ---------------- VICTORY SCREEN ----------------
 if st.session_state.victory:
     st.balloons()
     hero_html = render_sprite_html(HERO_FILES, "🤺")
@@ -440,67 +437,67 @@ if st.session_state.victory:
     st.markdown(f"""
     <div class="battle-arena" style="{bg_style}">
         <div class="arena-overlay" style="text-align:center; padding: 25px;">
-            <div class="stage-banner">🎉 ĐẠI THẮNG! GIẢI CỨU RỒNG THÀNH CÔNG! 🎉</div>
+            <div class="stage-banner">🎉 VICTORY! DRAGON RESCUED! 🎉</div>
             <div style="margin: 15px 0;">
                 <span class="dragon-fly-free">🐉✨</span>
             </div>
             <div style="display:flex; justify-content:space-around; align-items:center; margin-top:20px;">
                 <div>
                     {hero_html}
-                    <div style="font-weight:bold; color:#00e676; margin-top:8px;">Hiệp Sĩ Chiến Thắng!</div>
+                    <div style="font-weight:bold; color:#00e676; margin-top:8px;">Main Wins!</div>
                 </div>
-                <div style="font-size:40px;">⚡⚔️💥</div>
+                <div class="vs-badge">VS</div>
                 <div>
                     {princess_html}
-                    <div style="font-weight:bold; color:#ff616f; margin-top:8px;">Công Chúa Bị Đánh Bay!</div>
+                    <div style="font-weight:bold; color:#ff616f; margin-top:8px;">Princess Blasted Away!</div>
                 </div>
             </div>
             <p style="margin-top:20px; font-size:17px; color:#ffd700;">
-                Xiềng xích đã vỡ! Công chúa độc ác bị đánh bay khỏi tòa tháp và Rồng thần đã tung cánh bay về bầu trời tự do!
+                Chains broken! Evil Princess was blasted off the tower and Dragon God flies free into the sky!
             </p>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    st.success(f"🏆 Chúc mừng Hiệp Sĩ đã chinh phục toàn bộ 15 thử thách Toán học với số điểm tuyệt đối: **{st.session_state.score} EXP**!")
+    st.success(f"🏆 Congratulations Main for conquering all 15 Math challenges with a perfect score of: **{st.session_state.score} EXP**!")
     if st.session_state.last_explanation:
-        with st.expander("📖 Xem lại lời giải Câu 15", expanded=False):
+        with st.expander("📖 Review Question 15 Solution", expanded=False):
             st.markdown(st.session_state.last_explanation)
-    if st.button("🔄 Chơi lại từ đầu", type="primary"):
+    if st.button("🔄 Play Again", type="primary"):
         restart_game()
         safe_rerun()
     st.stop()
 
-# ---------------- MÀN HÌNH THẤT BẠI (BỊ LÍNH ĐÁNH CHẾT) ----------------
+# ---------------- GAME OVER SCREEN ----------------
 if st.session_state.game_over:
     dead_hero_html = render_sprite_html(HERO_FILES, "🤺", extra_class="dead-knight")
     
     st.markdown(f"""
     <div class="battle-arena" style="{bg_style}">
         <div class="arena-overlay" style="text-align:center; padding: 25px;">
-            <div class="stage-banner" style="color:#ff4b4b;">💀 BẠN ĐÃ BỊ LÍNH CANH ĐÁNH GỤC! 💀</div>
+            <div class="stage-banner" style="color:#ff4b4b;">💀 YOU WERE DEFEATED BY GUARDS! 💀</div>
             <div style="display:flex; justify-content:center; align-items:center; gap:25px; margin: 25px 0;">
                 <div class="guard-attack-left">💂‍♂️⚔️</div>
                 <div>{dead_hero_html}</div>
                 <div class="guard-attack-right">⚔️💂‍♂️</div>
             </div>
             <p style="color:#ff8a8a; font-size:16px; font-weight:bold;">
-                Do giải sai phép tính, đội lính canh của Công Chúa Độc Ác đã ập vào kết liễu Hiệp Sĩ!
+                Due to a calculation error, Evil Princess's guards rushed in and defeated Main!
             </p>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    st.error("💔 Nhiệm vụ giải cứu Rồng thất bại! Hãy xem kỹ lời giải bên dưới để phục thù nhé!")
+    st.error("💔 Mission failed! Check the solution below to prepare for revenge!")
     if st.session_state.last_explanation:
-        with st.expander("📖 Bí kíp giải câu vừa trả lời sai", expanded=True):
+        with st.expander("📖 Solution for the missed question", expanded=True):
             st.markdown(st.session_state.last_explanation)
-    if st.button("🔄 Hồi sinh và Phục thù ngay!", type="primary"):
+    if st.button("🔄 Revive and Try Again!", type="primary"):
         restart_game()
         safe_rerun()
     st.stop()
 
-# ---------------- MÀN HÌNH CHIẾN ĐẤU CHÍNH ----------------
+# ---------------- MAIN COMBAT SCREEN ----------------
 current_q = current_stage["questions"][st.session_state.q_index]
 hero_sprite_html = render_sprite_html(HERO_FILES, "🤺")
 boss_sprite_html = render_sprite_html(current_stage["boss_files"], current_stage["boss_fallback"])
@@ -515,36 +512,36 @@ st.markdown(f"""
         <div class="fighters-row">
             <div class="fighter-box">
                 {hero_sprite_html}
-                <div style="font-weight:bold; margin-top:8px;">Hiệp Sĩ Giải Cứu Rồng</div>
+                <div style="font-weight:bold; margin-top:8px;">Main</div>
                 <div class="hp-bar-bg">
                     <div class="hp-bar-fill-hero" style="width: {st.session_state.hero_hp}%;"></div>
                 </div>
-                <small>❤️ 1 Mạng Tử Chiến | EXP: {st.session_state.score}</small>
+                <small>❤️ 1 Life | EXP: {st.session_state.score}</small>
             </div>
-            <div class="vs-badge">⚔️ VS ⚔️</div>
+            <div class="vs-badge">VS</div>
             <div class="fighter-box">
                 {boss_sprite_html}
                 <div style="font-weight:bold; margin-top:8px;">{current_stage["boss_name"]}</div>
                 <div class="hp-bar-bg">
                     <div class="hp-bar-fill-boss" style="width: {st.session_state.boss_hp}%;"></div>
                 </div>
-                <small>HP Boss: {st.session_state.boss_hp}/100</small>
+                <small>Boss HP: {st.session_state.boss_hp}/100</small>
             </div>
         </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Nhật ký chiến đấu & lời giải câu trước
+# Combat log & last explanation
 st.info(st.session_state.combat_log)
 if st.session_state.last_explanation:
-    with st.expander("📖 Xem lời giải chi tiết của đòn đánh vừa rồi", expanded=False):
+    with st.expander("📖 Detailed solution of the last attack", expanded=False):
         st.markdown(st.session_state.last_explanation)
 
-# Hiển thị câu hỏi hiện tại
+# Display current question
 st.markdown(f"""
 <div class="quest-card">
-    <h4>📜 {current_q["title"]} (Câu {st.session_state.q_index + 1}/5 của Màn {st.session_state.stage})</h4>
+    <h4>📜 {current_q["title"]} (Question {st.session_state.q_index + 1}/5 of Stage {st.session_state.stage})</h4>
     <p>{current_q["desc"]}</p>
 </div>
 """, unsafe_allow_html=True)
@@ -552,20 +549,20 @@ st.markdown(f"""
 st.latex(current_q["latex"])
 
 user_choice = st.radio(
-    "Chọn chiêu thức giải toán (Lưu ý: Sai 1 câu sẽ bị lính đánh chết ngay!):",
+    "Select your solution skill (Note: 1 mistake means instant death!):",
     current_q["options"],
     key=f"radio_q_{current_q['id']}"
 )
 
-if st.button("⚡ Vung Kiếm Tấn Công!", type="primary"):
-    st.session_state.last_explanation = f"**Đáp án đúng:** `{current_q['answer']}`\n\n**Lời giải chi tiết:** {current_q['explanation']}"
+if st.button("⚡ Swing Sword Attack!", type="primary"):
+    st.session_state.last_explanation = f"**Correct Answer:** `{current_q['answer']}`\n\n**Detailed Solution:** {current_q['explanation']}"
     
     if user_choice == current_q["answer"]:
         st.session_state.boss_hp -= 20
         st.session_state.score += 100
-        st.session_state.combat_log = f"💥 ĐÒN CHÍ MẠNG! Bạn chém trúng {current_stage['boss_name']} gây 20 sát thương!"
+        st.session_state.combat_log = f"💥 CRITICAL HIT! You slashed {current_stage['boss_name']} dealing 20 damage!"
         
-        # Kiểm tra qua câu hoặc qua màn
+        # Check next question or next stage
         if st.session_state.q_index + 1 < len(current_stage["questions"]):
             st.session_state.q_index += 1
         else:
@@ -574,11 +571,11 @@ if st.button("⚡ Vung Kiếm Tấn Công!", type="primary"):
                 st.session_state.stage += 1
                 st.session_state.q_index = 0
                 st.session_state.boss_hp = 100
-                st.session_state.combat_log = f"🔥 BẠN ĐÃ ĐÁNH BẠI {old_boss.upper()}! Tiến sang Màn {st.session_state.stage}!"
+                st.session_state.combat_log = f"🔥 YOU DEFEATED {old_boss.upper()}! Moving to Stage {st.session_state.stage}!"
             else:
                 st.session_state.victory = True
     else:
-        # Trả lời sai 1 câu -> Bị lính đánh chết ngay lập tức
+        # Wrong answer -> Instant Game Over
         st.session_state.hero_hp = 0
         st.session_state.game_over = True
     
