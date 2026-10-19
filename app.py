@@ -2,17 +2,38 @@ import streamlit as st
 import streamlit.components.v1 as components
 import base64
 import os
+import streamlit as st
 import streamlit.components.v1 as components
 
+# Chuỗi HTML bạn vừa cung cấp
+html_code = """
+<div class="actor-container" style="animation: heroEnter_1 1.4s forwards ease-out;">
+    <div class="actor-label">Hiệp Sĩ</div>
+    <!-- Thay đoạn base64 dài bằng biến ảnh của bạn nếu cần -->
+    <div style="font-size: 60px;">🤺</div>
+</div>
 
-def get_base64_image(file_path):
-  if os.path.exists(file_path):
-    with open(file_path, 'rb') as f:
-      data = f.read()
-    return f"data:image/png;base64,{base64.b64encode(data).decode('utf-8')}"
-  return ''
+<style>
+    @keyframes heroEnter_1 {
+        0% { transform: translateX(-40px); opacity: 0; }
+        100% { transform: translateX(0px); opacity: 1; }
+    }
+    .actor-label {
+        background: rgba(0,0,0,0.78);
+        color: #ffd700;
+        font-size: 11px;
+        font-weight: bold;
+        padding: 2px 7px;
+        border-radius: 6px;
+        border: 1px solid #ffd700;
+        margin-bottom: 3px;
+        display: inline-block;
+    }
+</style>
+"""
 
-
+st.title("Test Hiệu Ứng Nhân Vật")
+components.html(html_code, height=150)
 # Lấy chuỗi base64 chuẩn không bao giờ bị lỗi ngắt dòng
 hero_b64 = get_base64_image('hero.png')
 
