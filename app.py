@@ -4,19 +4,18 @@ import os
 
 # Cấu hình trang
 st.set_page_config(
-    page_title="Hiệp Sĩ Giải Cứu Rồng - Toán 9 & Ôn Thi 10",
+    page_title="Hiệp Sĩ Giải Cứu Rồng - 2D Adventure",
     page_icon="🐉",
     layout="centered"
 )
 
-# Hàm tự động tải lại trang tương thích mọi phiên bản Streamlit
 def safe_rerun():
     if hasattr(st, "rerun"):
         st.rerun()
     else:
         st.experimental_rerun()
 
-# Hàm đọc file ảnh sang Base64 để nhúng trực tiếp vào đồ họa 2D CSS
+# Đọc ảnh sang Base64 để gắn trực tiếp vào khung hình 2D
 def get_image_base64(file_candidates):
     for filename in file_candidates:
         if os.path.exists(filename):
@@ -27,174 +26,33 @@ def get_image_base64(file_candidates):
             return f"data:{mime};base64,{base64.b64encode(data).decode()}"
     return None
 
-def render_sprite_html(file_candidates, fallback_emoji, extra_class=""):
+def render_actor_img(file_candidates, fallback_emoji, css_class="sprite-img"):
     b64 = get_image_base64(file_candidates)
     if b64:
-        return f'<img src="{b64}" class="pixel-sprite {extra_class}">'
-    return f'<div class="emoji-sprite {extra_class}">{fallback_emoji}</div>'
+        return f'<img src="{b64}" class="{css_class}">'
+    return f'<div class="fallback-emoji {css_class}">{fallback_emoji}</div>'
 
-# ================= CSS ĐỒ HỌA 2D & HIỆU ỨNG HOẠT HỌA =================
-st.markdown("""
-<style>
-.battle-arena {
-    border: 4px solid #ffd700;
-    border-radius: 16px;
-    padding: 22px;
-    color: white;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    margin-bottom: 20px;
-    background-size: cover;
-    background-position: center;
-    position: relative;
-    overflow: hidden;
-    min-height: 310px;
-}
-.arena-overlay {
-    background: rgba(10, 12, 22, 0.68);
-    border-radius: 12px;
-    padding: 15px;
-    backdrop-filter: blur(2px);
-}
-.stage-banner {
-    text-align: center;
-    font-size: 20px;
-    font-weight: 900;
-    color: #ffd700;
-    text-transform: uppercase;
-    margin-bottom: 12px;
-    text-shadow: 2px 2px 6px #000;
-}
-.fighters-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-}
-.fighter-box {
-    text-align: center;
-    width: 43%;
-    background: rgba(0, 0, 0, 0.65);
-    padding: 15px;
-    border-radius: 12px;
-    border: 2px solid rgba(255, 215, 0, 0.4);
-}
-.pixel-sprite {
-    height: 125px;
-    width: auto;
-    object-fit: contain;
-    image-rendering: pixelated;
-    border-radius: 8px;
-    animation: float 2s infinite ease-in-out;
-}
-.emoji-sprite {
-    font-size: 75px;
-    line-height: 1.1;
-    display: inline-block;
-    animation: float 2s infinite ease-in-out;
-}
-.vs-badge {
-    font-size: 30px;
-    font-weight: 900;
-    color: #ff3b3b;
-    text-shadow: 0 0 12px #ff0000, 2px 2px 2px #000;
-}
-.hp-bar-bg {
-    background: #2b2b2b;
-    border-radius: 8px;
-    height: 16px;
-    width: 100%;
-    margin-top: 8px;
-    overflow: hidden;
-    border: 1px solid #fff;
-}
-.hp-bar-fill-hero {
-    background: linear-gradient(90deg, #00e676, #66ffa6);
-    height: 100%;
-}
-.hp-bar-fill-boss {
-    background: linear-gradient(90deg, #ff1744, #ff616f);
-    height: 100%;
-}
-.quest-card {
-    background: #1e2029;
-    border-left: 6px solid #ffd700;
-    padding: 16px;
-    border-radius: 10px;
-    color: #ffffff;
-    margin-bottom: 12px;
-}
-
-/* Hoạt họa nhân vật nhấp nhô */
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
-}
-
-/* Hoạt họa Game Over: Lính canh lao vào đánh gục Hiệp Sĩ */
-.dead-knight {
-    transform: rotate(-90deg) scale(0.85) !important;
-    filter: grayscale(100%) brightness(60%);
-    animation: none !important;
-}
-.guard-attack-left {
-    display: inline-block;
-    font-size: 55px;
-    animation: rushRight 0.8s infinite alternate ease-in-out;
-}
-.guard-attack-right {
-    display: inline-block;
-    font-size: 55px;
-    animation: rushLeft 0.8s infinite alternate ease-in-out;
-}
-@keyframes rushRight {
-    0% { transform: translateX(-25px); }
-    100% { transform: translateX(10px) rotate(15deg); }
-}
-@keyframes rushLeft {
-    0% { transform: translateX(25px); }
-    100% { transform: translateX(-10px) rotate(-15deg); }
-}
-
-/* Hoạt họa Phá Đảo: Công chúa bị đánh bay & Rồng bay đi */
-.princess-blast-off {
-    animation: blastOff 3.5s forwards ease-in !important;
-}
-@keyframes blastOff {
-    0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
-    30% { transform: translate(60px, -80px) rotate(360deg) scale(0.7); opacity: 0.9; }
-    100% { transform: translate(350px, -400px) rotate(1440deg) scale(0); opacity: 0; }
-}
-.dragon-fly-free {
-    font-size: 85px;
-    display: inline-block;
-    animation: dragonFly 4s infinite ease-in-out;
-}
-@keyframes dragonFly {
-    0% { transform: translate(-120px, 30px) scale(0.8); }
-    50% { transform: translate(20px, -35px) scale(1.15); }
-    100% { transform: translate(160px, -90px) scale(0.9); }
-}
-</style>
-""", unsafe_allow_html=True)
-
-# ================= DỮ LIỆU 3 MÀN CHƠI & 15 CÂU HỎI =================
+# ================= DỮ LIỆU NHÂN VẬT & 3 MÀN CHƠI =================
 HERO_FILES = ["main.png", "main.jpg", "image_b090fc.png"]
+
+# Tọa độ X (%) của Hiệp sĩ trên khung hình tương ứng với câu hỏi 0, 1, 2, 3, 4
+HERO_POSITIONS = [8, 22, 36, 50, 64]
 
 STAGES = {
     1: {
         "name": "Màn 1: Tàn Tích Rừng Đen (Cơ bản)",
-        "story": "Hiệp sĩ tiến vào khu rừng âm u để tìm đường đến lâu đài giải cứu Rồng thần. Tên Sát Thủ Áo Đen bất ngờ chặn đường!",
+        "story": "Hiệp sĩ băng qua khu rừng tàn tích để tiến về lâu đài. Sát Thủ Áo Đen đang chặn ở cổng đá phía bên phải khung hình!",
         "boss_name": "Sát Thủ Áo Đen",
         "boss_files": ["boss1.png", "boss1.jpg", "image_b09486.png"],
         "boss_fallback": "🥷",
         "bg_files": ["bg1.jpg", "bg1.png", "image_b0955a.jpg"],
-        "bg_fallback_gradient": "linear-gradient(180deg, #1b1b1b 0%, #3a3a3a 60%, #111111 100%)",
+        "bg_fallback": "linear-gradient(180deg, #1b1b1b 0%, #3a3a3a 70%, #111111 100%)",
         "questions": [
             {
                 "id": 1,
                 "title": "Câu 1: Giải phương trình bậc hai",
                 "latex": r"x^2 - 5x + 6 = 0",
-                "desc": "Tìm tập nghiệm của phương trình trên:",
+                "desc": "Giải phương trình để bước tiếp qua khu rừng:",
                 "options": ["x = 2 hoặc x = 3", "x = -2 hoặc x = -3", "x = 1 hoặc x = 6", "x = -1 hoặc x = 6"],
                 "answer": "x = 2 hoặc x = 3",
                 "explanation": "Ta có: $x^2 - 5x + 6 = 0 \\iff (x - 2)(x - 3) = 0 \\iff x = 2$ hoặc $x = 3$."
@@ -203,7 +61,7 @@ STAGES = {
                 "id": 2,
                 "title": "Câu 2: Rút gọn biểu thức chứa căn",
                 "latex": r"A = \frac{\sqrt{12} + \sqrt{27} - \sqrt{3}}{\sqrt{3}}",
-                "desc": "Giá trị rút gọn của biểu thức A là:",
+                "desc": "Tìm giá trị rút gọn của biểu thức A:",
                 "options": ["4", "5", "3", "4√3"],
                 "answer": "4",
                 "explanation": "Vì $\\sqrt{12} = 2\\sqrt{3}$ và $\\sqrt{27} = 3\\sqrt{3}$, nên $A = \\frac{2\\sqrt{3} + 3\\sqrt{3} - \\sqrt{3}}{\\sqrt{3}} = \\frac{4\\sqrt{3}}{\\sqrt{3}} = 4$."
@@ -220,7 +78,7 @@ STAGES = {
                     "x = (-3 ± √17) / 2"
                 ],
                 "answer": "x = (3 ± √17) / 2",
-                "explanation": "Quy đồng khử mẫu: $2(x+1) + (x-1) = x^2 - 1 \\iff x^2 - 3x - 2 = 0$. Ta có $\\Delta = (-3)^2 - 4(1)(-2) = 17 > 0 \\implies x = \\frac{3 \\pm \\sqrt{17}}{2}$ (thỏa mãn ĐK)."
+                "explanation": "Quy đồng khử mẫu: $2(x+1) + (x-1) = x^2 - 1 \\iff x^2 - 3x - 2 = 0$. Ta có $\\Delta = 17 > 0 \\implies x = \\frac{3 \\pm \\sqrt{17}}{2}$ (thỏa mãn ĐK)."
             },
             {
                 "id": 4,
@@ -235,7 +93,7 @@ STAGES = {
                 "id": 5,
                 "title": "Câu 5: Bài toán thực tế hình học",
                 "latex": r"2(a + b) = 34, \quad a \cdot b = 60",
-                "desc": "Một hình chữ nhật có chu vi 34 cm và diện tích 60 cm². Tìm chiều dài a và chiều rộng b:",
+                "desc": "Một hình chữ nhật có chu vi 34 cm và diện tích 60 cm². Tính chiều dài a và chiều rộng b:",
                 "options": [
                     "Chiều dài 12 cm, chiều rộng 5 cm",
                     "Chiều dài 10 cm, chiều rộng 6 cm",
@@ -249,12 +107,12 @@ STAGES = {
     },
     2: {
         "name": "Màn 2: Cổng Lâu Đài Giam Rồng (Tuyển sinh 10)",
-        "story": "Rồng thần đang bị xích trên đỉnh tháp lâu đài! Để tiến vào trong, Hiệp sĩ phải vượt qua Tử Thần Lửa Đỏ canh cổng!",
+        "story": "Rồng thần đang bị giam trên đỉnh tháp! Hiệp sĩ phải băng qua cánh đồng trước lâu đài và đánh bại Tử Thần Lửa Đỏ!",
         "boss_name": "Tử Thần Lửa Đỏ",
         "boss_files": ["boss2.png", "boss2.jpg", "image_b094c4.png"],
         "boss_fallback": "💀🔥",
         "bg_files": ["bg2.png", "bg2.jpg", "image_b0e738.png"],
-        "bg_fallback_gradient": "linear-gradient(180deg, #3a7bd5 0%, #3a6073 60%, #16222a 100%)",
+        "bg_fallback": "linear-gradient(180deg, #3a7bd5 0%, #3a6073 70%, #16222a 100%)",
         "questions": [
             {
                 "id": 6,
@@ -278,7 +136,7 @@ STAGES = {
                 "id": 8,
                 "title": "Câu 8: Bài toán năng suất công việc",
                 "latex": r"\begin{cases} \frac{1}{x} + \frac{1}{y} = \frac{1}{6} \\ \frac{5}{x} + \frac{4}{y} = \frac{3}{4} \end{cases}",
-                "desc": "Hai người cùng làm chung thì xong trong 6 giờ. Nếu người 1 làm 5 giờ và người 2 làm 4 giờ thì được 3/4 công việc. Hỏi làm một mình thì mỗi người mất bao lâu?",
+                "desc": "Hai người làm chung 6 giờ thì xong. Nếu người 1 làm 5 giờ và người 2 làm 4 giờ thì được 3/4 công việc. Hỏi làm riêng mỗi người mất bao lâu?",
                 "options": [
                     "Người 1: 12 giờ, Người 2: 12 giờ",
                     "Người 1: 10 giờ, Người 2: 15 giờ",
@@ -286,7 +144,7 @@ STAGES = {
                     "Người 1: 9 giờ, Người 2: 18 giờ"
                 ],
                 "answer": "Người 1: 12 giờ, Người 2: 12 giờ",
-                "explanation": "Từ $\\frac{1}{x} + \\frac{1}{y} = \\frac{1}{6} \\implies \\frac{4}{x} + \\frac{4}{y} = \\frac{2}{3}$. Lấy phương trình dưới trừ đi ta được: $\\frac{1}{x} = \\frac{3}{4} - \\frac{2}{3} = \\frac{1}{12} \\implies x = 12$ giờ, suy ra $y = 12$ giờ."
+                "explanation": "Từ $\\frac{1}{x} + \\frac{1}{y} = \\frac{1}{6} \\implies \\frac{4}{x} + \\frac{4}{y} = \\frac{2}{3}$. Lấy phương trình dưới trừ đi: $\\frac{1}{x} = \\frac{3}{4} - \\frac{2}{3} = \\frac{1}{12} \\implies x = 12$ giờ, $y = 12$ giờ."
             },
             {
                 "id": 9,
@@ -320,12 +178,12 @@ STAGES = {
     },
     3: {
         "name": "Màn 3: Đại Sảnh Ngai Vàng (Toán Chuyên LTV)",
-        "story": "Giữa đại sảnh uy nghiêm đầy lính gác, Công Chúa Độc Ác đang nắm giữ chìa khóa giam cầm Rồng thần. Chỉ một sai lầm nhỏ, lính canh sẽ kết liễu bạn!",
+        "story": "Hiệp sĩ tiến bước dọc theo thảm đỏ đại sảnh! Công Chúa Độc Ác ngự trên ngai vàng cùng đội lính gác sẵn sàng kết liễu nếu bạn tính sai!",
         "boss_name": "Công Chúa Độc Ác",
         "boss_files": ["boss3.jpg", "boss3.png", "image_b0951d.jpg"],
         "boss_fallback": "👸👑",
         "bg_files": ["bg3.jpg", "bg3.png", "image_b0e7d3.jpg"],
-        "bg_fallback_gradient": "linear-gradient(180deg, #4b1248 0%, #f0c27b 100%)",
+        "bg_fallback": "linear-gradient(180deg, #4b1248 0%, #f0c27b 100%)",
         "questions": [
             {
                 "id": 11,
@@ -405,181 +263,390 @@ STAGES = {
 if "stage" not in st.session_state:
     st.session_state.stage = 1
     st.session_state.q_index = 0
-    st.session_state.hero_hp = 100
+    st.session_state.prev_x = -12
+    st.session_state.curr_x = HERO_POSITIONS[0]
+    st.session_state.action_state = "enter"  # 'enter', 'walk_attack', 'stage_clear', 'dead', 'victory'
+    st.session_state.step_counter = 1
     st.session_state.boss_hp = 100
     st.session_state.score = 0
-    st.session_state.combat_log = "⚔️ Hành trình giải cứu Rồng bắt đầu! Cẩn thận: Trả lời sai 1 câu sẽ bị lính canh đánh chết ngay lập tức!"
+    st.session_state.combat_log = "⚔️ Hiệp sĩ bước vào khung hình! Hãy giải toán để tiến lên phía trước và chém Boss!"
     st.session_state.last_explanation = None
-    st.session_state.game_over = False
-    st.session_state.victory = False
 
 def restart_game():
     st.session_state.stage = 1
     st.session_state.q_index = 0
-    st.session_state.hero_hp = 100
+    st.session_state.prev_x = -12
+    st.session_state.curr_x = HERO_POSITIONS[0]
+    st.session_state.action_state = "enter"
+    st.session_state.step_counter += 1
     st.session_state.boss_hp = 100
     st.session_state.score = 0
-    st.session_state.combat_log = "⚔️ Hiệp sĩ đã hồi sinh! Hãy giải cứu Rồng thần khỏi Công Chúa Độc Ác!"
+    st.session_state.combat_log = "⚔️ Hiệp sĩ đã hồi sinh và bước vào màn chơi từ đầu!"
     st.session_state.last_explanation = None
-    st.session_state.game_over = False
-    st.session_state.victory = False
 
-# ================= GIAO DIỆN CHÍNH =================
-st.title("🐉 Hiệp Sĩ Giải Cứu Rồng Khỏi Công Chúa Độc Ác")
+# ================= CSS CỐ ĐỊNH CHO KHUNG HÌNH 2D =================
+st.markdown("""
+<style>
+.hud-bar {
+    background: #141622;
+    border: 3px solid #ffd700;
+    border-radius: 12px 12px 0 0;
+    padding: 10px 18px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.hp-track {
+    background: #333;
+    border: 1px solid #fff;
+    border-radius: 6px;
+    height: 14px;
+    width: 160px;
+    overflow: hidden;
+    margin-top: 4px;
+}
+.hp-fill-hero {
+    background: linear-gradient(90deg, #00e676, #69f0ae);
+    height: 100%;
+}
+.hp-fill-boss {
+    background: linear-gradient(90deg, #ff1744, #ff616f);
+    height: 100%;
+    transition: width 0.4s ease;
+}
+.stage-viewport {
+    position: relative;
+    width: 100%;
+    height: 350px;
+    border: 4px solid #ffd700;
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    background-size: cover;
+    background-position: center bottom;
+    overflow: hidden;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.85);
+    margin-bottom: 18px;
+}
+.ground-path {
+    position: absolute;
+    bottom: 22px;
+    left: 8%;
+    width: 72%;
+    height: 6px;
+    background: rgba(255, 215, 0, 0.35);
+    border-radius: 4px;
+    z-index: 1;
+}
+.step-dot {
+    position: absolute;
+    bottom: 18px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ffd700;
+    border: 2px solid #000;
+    z-index: 2;
+}
+.actor-container {
+    position: absolute;
+    bottom: 28px;
+    z-index: 5;
+    text-align: center;
+}
+.sprite-img {
+    height: 120px;
+    width: auto;
+    object-fit: contain;
+    image-rendering: pixelated;
+    filter: drop-shadow(0 5px 8px rgba(0,0,0,0.9));
+    border-radius: 6px;
+}
+.fallback-emoji {
+    font-size: 72px;
+    line-height: 1.1;
+    filter: drop-shadow(0 5px 8px rgba(0,0,0,0.9));
+}
+.actor-label {
+    background: rgba(0, 0, 0, 0.75);
+    color: #ffd700;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 8px;
+    border: 1px solid #ffd700;
+    margin-bottom: 4px;
+    white-space: nowrap;
+}
+.quest-card {
+    background: #1e2029;
+    border-left: 6px solid #ffd700;
+    padding: 15px;
+    border-radius: 10px;
+    color: #ffffff;
+    margin-bottom: 12px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ================= HIỂN THỊ TIÊU ĐỀ & KHUNG CẢNH =================
+st.title("🐉 Hiệp Sĩ Giải Cứu Rồng - Chuyển Động 2D")
 
 current_stage = STAGES[st.session_state.stage]
 bg_b64 = get_image_base64(current_stage["bg_files"])
-bg_style = f"background-image: url('{bg_b64}');" if bg_b64 else f"background: {current_stage['bg_fallback_gradient']};"
+bg_style = f"background-image: url('{bg_b64}');" if bg_b64 else f"background: {current_stage['bg_fallback']};"
 
-# ---------------- MÀN HÌNH CHIẾN THẮNG (CUTSCENE PHÁ ĐẢO) ----------------
-if st.session_state.victory:
-    st.balloons()
-    hero_html = render_sprite_html(HERO_FILES, "🤺")
-    princess_html = render_sprite_html(STAGES[3]["boss_files"], "👸👑", extra_class="princess-blast-off")
-    
-    st.markdown(f"""
-    <div class="battle-arena" style="{bg_style}">
-        <div class="arena-overlay" style="text-align:center; padding: 25px;">
-            <div class="stage-banner">🎉 ĐẠI THẮNG! GIẢI CỨU RỒNG THÀNH CÔNG! 🎉</div>
-            <div style="margin: 15px 0;">
-                <span class="dragon-fly-free">🐉✨</span>
-            </div>
-            <div style="display:flex; justify-content:space-around; align-items:center; margin-top:20px;">
-                <div>
-                    {hero_html}
-                    <div style="font-weight:bold; color:#00e676; margin-top:8px;">Hiệp Sĩ Chiến Thắng!</div>
-                </div>
-                <div style="font-size:40px;">⚡⚔️💥</div>
-                <div>
-                    {princess_html}
-                    <div style="font-weight:bold; color:#ff616f; margin-top:8px;">Công Chúa Bị Đánh Bay!</div>
-                </div>
-            </div>
-            <p style="margin-top:20px; font-size:17px; color:#ffd700;">
-                Xiềng xích đã vỡ! Công chúa độc ác bị đánh bay khỏi tòa tháp và Rồng thần đã tung cánh bay về bầu trời tự do!
-            </p>
-        </div>
+hero_img_html = render_actor_img(HERO_FILES, "🤺")
+boss_img_html = render_actor_img(current_stage["boss_files"], current_stage["boss_fallback"])
+
+# Tạo tên animation độc nhất ở mỗi bước để trình duyệt luôn chạy lại chuyển động
+anim_id = st.session_state.step_counter
+prev_x = st.session_state.prev_x
+curr_x = st.session_state.curr_x
+state = st.session_state.action_state
+
+# Tạo CSS Keyframes động theo đúng tọa độ bước đi của Hiệp sĩ trên khung hình
+dynamic_keyframes = f"""
+<style>
+/* 1. Hiệp sĩ bước từ ngoài rìa trái vào khung hình */
+@keyframes heroEnter_{anim_id} {{
+    0% {{ left: -12%; transform: translateY(0px); }}
+    20% {{ transform: translateY(-12px) rotate(-3deg); }}
+    40% {{ transform: translateY(0px) rotate(3deg); }}
+    60% {{ transform: translateY(-12px) rotate(-3deg); }}
+    80% {{ transform: translateY(0px) rotate(3deg); }}
+    100% {{ left: {curr_x}%; transform: translateY(0px) rotate(0deg); }}
+}}
+
+/* 2. Hiệp sĩ đi bộ tới điểm tiếp theo, lao lên chém Boss rồi lùi về điểm đứng */
+@keyframes heroWalkSlash_{anim_id} {{
+    0% {{ left: {prev_x}%; transform: translateY(0px) scale(1); }}
+    15% {{ transform: translateY(-14px) rotate(-4deg); }}
+    30% {{ left: {curr_x}%; transform: translateY(0px) rotate(4deg); }}
+    50% {{ left: 68%; transform: translateY(-10px) scale(1.15) rotate(12deg); }}
+    70% {{ left: {curr_x}%; transform: translateY(0px) scale(1) rotate(0deg); }}
+    100% {{ left: {curr_x}%; transform: translateY(0px) scale(1); }}
+}}
+
+/* 3. Hiệp sĩ đi bộ xuyên qua khung hình sang phải khi hạ xong Boss màn 1 & 2 */
+@keyframes heroExitFrame_{anim_id} {{
+    0% {{ left: {prev_x}%; transform: translateY(0px); }}
+    20% {{ left: 72%; transform: translateY(-14px) scale(1.15) rotate(10deg); }}
+    40% {{ left: 78%; transform: translateY(0px) scale(1); }}
+    60% {{ left: 88%; transform: translateY(-12px) rotate(-4deg); }}
+    80% {{ left: 98%; transform: translateY(0px) rotate(4deg); }}
+    100% {{ left: 108%; transform: translateY(0px); }}
+}}
+
+/* Hiệu ứng kiếm khí bay ngang màn hình */
+@keyframes swordWave_{anim_id} {{
+    0%, 25% {{ left: {curr_x}%; opacity: 0; transform: scale(0.5); }}
+    45% {{ left: {curr_x + 10}%; opacity: 1; transform: scale(1.3); }}
+    65% {{ left: 78%; opacity: 1; transform: scale(1.6); }}
+    75%, 100% {{ left: 82%; opacity: 0; transform: scale(2); }}
+}}
+
+/* Hiệu ứng Boss bị trúng đòn văng lùi */
+@keyframes bossHit_{anim_id} {{
+    0%, 45% {{ right: 8%; transform: translateX(0) rotate(0deg); filter: brightness(1); }}
+    55% {{ right: 4%; transform: translateX(18px) rotate(12deg); filter: brightness(2) sepia(1) hue-rotate(-50deg); }}
+    70% {{ right: 8%; transform: translateX(-6px) rotate(-5deg); }}
+    100% {{ right: 8%; transform: translateX(0) rotate(0deg); filter: brightness(1); }}
+}}
+
+/* Hiệu ứng Boss ngã gục khi qua màn */
+@keyframes bossDefeated_{anim_id} {{
+    0%, 25% {{ right: 8%; transform: rotate(0deg) scale(1); opacity: 1; }}
+    50% {{ right: 4%; transform: translateY(30px) rotate(90deg) scale(0.85); opacity: 0.7; }}
+    100% {{ right: 4%; transform: translateY(50px) rotate(90deg) scale(0.7); opacity: 0.15; }}
+}}
+
+/* Hiệu ứng Công Chúa bị đánh bay khỏi màn hình ở Màn 3 */
+@keyframes princessBlastOff_{anim_id} {{
+    0%, 20% {{ right: 8%; bottom: 28px; transform: rotate(0deg) scale(1); opacity: 1; }}
+    50% {{ right: -5%; bottom: 180px; transform: rotate(540deg) scale(0.7); opacity: 0.9; }}
+    100% {{ right: -30%; bottom: 420px; transform: rotate(1440deg) scale(0); opacity: 0; }}
+}}
+
+/* Hiệu ứng Rồng thần bay ngang bầu trời tự do */
+@keyframes dragonFlyAcross_{anim_id} {{
+    0% {{ left: -15%; top: 140px; transform: scale(0.7) rotate(-5deg); opacity: 0; }}
+    20% {{ opacity: 1; }}
+    50% {{ left: 45%; top: 35px; transform: scale(1.25) rotate(-10deg); opacity: 1; }}
+    100% {{ left: 110%; top: -30px; transform: scale(0.9) rotate(-15deg); opacity: 1; }}
+}}
+
+/* Hiệu ứng Lính canh lao từ 2 bên khung hình vào chém Hiệp sĩ khi trả lời sai */
+@keyframes guardLeftRush_{anim_id} {{
+    0% {{ left: -10%; bottom: 28px; }}
+    60%, 100% {{ left: {max(0, curr_x - 8)}%; bottom: 28px; transform: rotate(15deg) scale(1.1); }}
+}}
+@keyframes guardRightRush_{anim_id} {{
+    0% {{ left: 105%; bottom: 28px; }}
+    60%, 100% {{ left: {min(85, curr_x + 8)}%; bottom: 28px; transform: rotate(-15deg) scale(1.1); }}
+}}
+@keyframes heroFallDown_{anim_id} {{
+    0%, 45% {{ left: {curr_x}%; transform: rotate(0deg); filter: grayscale(0%); }}
+    70%, 100% {{ left: {curr_x}%; transform: translateY(25px) rotate(-90deg) scale(0.85); filter: grayscale(100%) brightness(50%); }}
+}}
+</style>
+"""
+st.markdown(dynamic_keyframes, unsafe_allow_html=True)
+
+# Xác định class hoạt họa cho Hiệp sĩ, Boss và Hiệu ứng phụ
+sword_wave_html = ""
+extra_actors_html = ""
+
+if state == "enter":
+    hero_anim_style = f"animation: heroEnter_{anim_id} 1.4s forwards ease-out;"
+    boss_anim_style = "right: 8%;"
+elif state == "walk_attack":
+    hero_anim_style = f"animation: heroWalkSlash_{anim_id} 1.8s forwards ease-in-out;"
+    boss_anim_style = f"animation: bossHit_{anim_id} 1.8s forwards ease-in-out;"
+    sword_wave_html = f'<div style="position:absolute; bottom:65px; font-size:48px; z-index:8; animation: swordWave_{anim_id} 1.8s forwards;">⚔️💥</div>'
+elif state == "stage_clear":
+    hero_anim_style = f"animation: heroExitFrame_{anim_id} 2.6s forwards ease-in-out;"
+    boss_anim_style = f"animation: bossDefeated_{anim_id} 2.6s forwards ease-out;"
+    sword_wave_html = f'<div style="position:absolute; bottom:65px; font-size:52px; z-index:8; animation: swordWave_{anim_id} 1.5s forwards;">⚡⚔️🔥</div>'
+elif state == "victory":
+    hero_anim_style = f"left: 55%; transform: scale(1.1);"
+    boss_anim_style = f"animation: princessBlastOff_{anim_id} 3s forwards ease-in;"
+    extra_actors_html = f"""
+    <div style="position:absolute; font-size:90px; z-index:10; animation: dragonFlyAcross_{anim_id} 4.5s infinite ease-in-out;">
+        🐉✨
     </div>
-    """, unsafe_allow_html=True)
-    
-    st.success(f"🏆 Chúc mừng Hiệp Sĩ đã chinh phục toàn bộ 15 thử thách Toán học với số điểm tuyệt đối: **{st.session_state.score} EXP**!")
-    if st.session_state.last_explanation:
-        with st.expander("📖 Xem lại lời giải Câu 15", expanded=False):
-            st.markdown(st.session_state.last_explanation)
-    if st.button("🔄 Chơi lại từ đầu", type="primary"):
+    """
+elif state == "dead":
+    hero_anim_style = f"animation: heroFallDown_{anim_id} 1.5s forwards ease-in;"
+    boss_anim_style = "right: 8%;"
+    extra_actors_html = f"""
+    <div style="position:absolute; font-size:65px; z-index:9; animation: guardLeftRush_{anim_id} 1.2s forwards ease-out;">💂‍♂️⚔️</div>
+    <div style="position:absolute; font-size:65px; z-index:9; animation: guardRightRush_{anim_id} 1.2s forwards ease-out;">⚔️💂‍♂️</div>
+    """
+
+# Các chấm mốc bước đi trên mặt đất
+dots_html = "".join([
+    f'<div class="step-dot" style="left: {pos}%; background: {"#00e676" if idx <= st.session_state.q_index else "#555"};"></div>'
+    for idx, pos in enumerate(HERO_POSITIONS)
+])
+
+# ================= VẼ KHUNG HÌNH 2D (STAGE VIEWPORT) =================
+hero_hp_val = 0 if state == "dead" else 100
+st.markdown(f"""
+<div class="hud-bar">
+    <div>
+        <strong>🤺 Hiệp Sĩ Giải Cứu Rồng</strong> (Bước {min(st.session_state.q_index + 1, 5)}/5)<br>
+        <div class="hp-track"><div class="hp-fill-hero" style="width: {hero_hp_val}%;"></div></div>
+        <small>❤️ 1 Mạng Tử Chiến | Điểm: {st.session_state.score} EXP</small>
+    </div>
+    <div style="text-align:center; color:#ffd700; font-weight:bold; font-size:16px;">
+        {current_stage["name"]}
+    </div>
+    <div style="text-align:right;">
+        <strong>{current_stage["boss_name"]}</strong><br>
+        <div class="hp-track"><div class="hp-fill-boss" style="width: {st.session_state.boss_hp}%;"></div></div>
+        <small>HP Boss: {st.session_state.boss_hp}/100</small>
+    </div>
+</div>
+
+<div class="stage-viewport" style="{bg_style}">
+    <div class="ground-path"></div>
+    {dots_html}
+    {sword_wave_html}
+    {extra_actors_html}
+    <div class="actor-container" style="{hero_anim_style}">
+        <div class="actor-label">Hiệp Sĩ</div>
+        {hero_img_html}
+    </div>
+    <div class="actor-container" style="{boss_anim_style}">
+        <div class="actor-label" style="color:#ff8a80; border-color:#ff5252;">{current_stage["boss_name"]}</div>
+        {boss_img_html}
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
+# Nhật ký chiến đấu & Lời giải
+st.info(st.session_state.combat_log)
+if st.session_state.last_explanation:
+    with st.expander("📖 Xem lời giải chi tiết câu vừa rồi", expanded=(state in ["dead", "stage_clear", "victory"])):
+        st.markdown(st.session_state.last_explanation)
+
+# ================= XỬ LÝ CÁC TRẠNG THÁI CHUYỂN MÀN / THẮNG / THUA =================
+if state == "victory":
+    st.balloons()
+    st.success(f"🏆 ĐẠI THẮNG! Công Chúa Độc Ác đã bị đánh bay khỏi tòa tháp và Rồng thần đã tung cánh bay đi tự do! Tổng điểm: **{st.session_state.score} EXP**")
+    if st.button("🔄 Chơi lại hành trình từ đầu", type="primary"):
         restart_game()
         safe_rerun()
     st.stop()
 
-# ---------------- MÀN HÌNH THẤT BẠI (BỊ LÍNH ĐÁNH CHẾT) ----------------
-if st.session_state.game_over:
-    dead_hero_html = render_sprite_html(HERO_FILES, "🤺", extra_class="dead-knight")
-    
-    st.markdown(f"""
-    <div class="battle-arena" style="{bg_style}">
-        <div class="arena-overlay" style="text-align:center; padding: 25px;">
-            <div class="stage-banner" style="color:#ff4b4b;">💀 BẠN ĐÃ BỊ LÍNH CANH ĐÁNH GỤC! 💀</div>
-            <div style="display:flex; justify-content:center; align-items:center; gap:25px; margin: 25px 0;">
-                <div class="guard-attack-left">💂‍♂️⚔️</div>
-                <div>{dead_hero_html}</div>
-                <div class="guard-attack-right">⚔️💂‍♂️</div>
-            </div>
-            <p style="color:#ff8a8a; font-size:16px; font-weight:bold;">
-                Do giải sai phép tính, đội lính canh của Công Chúa Độc Ác đã ập vào kết liễu Hiệp Sĩ!
-            </p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.error("💔 Nhiệm vụ giải cứu Rồng thất bại! Hãy xem kỹ lời giải bên dưới để phục thù nhé!")
-    if st.session_state.last_explanation:
-        with st.expander("📖 Bí kíp giải câu vừa trả lời sai", expanded=True):
-            st.markdown(st.session_state.last_explanation)
+if state == "dead":
+    st.error("💀 BẠN ĐÃ BỊ LÍNH CANH ĐÁNH CHẾT! Chỉ cần trả lời sai 1 câu, lính gác sẽ lập tức ập vào kết liễu!")
     if st.button("🔄 Hồi sinh và Phục thù ngay!", type="primary"):
         restart_game()
         safe_rerun()
     st.stop()
 
-# ---------------- MÀN HÌNH CHIẾN ĐẤU CHÍNH ----------------
+if state == "stage_clear":
+    st.success(f"🎉 Bạn đã đánh bại **{current_stage['boss_name']}**! Hiệp sĩ đã đi xuyên qua khung hình để tiến sang màn kế tiếp!")
+    if st.button(f"🚪 Bước sang Màn {st.session_state.stage + 1} ➡️", type="primary"):
+        st.session_state.stage += 1
+        st.session_state.q_index = 0
+        st.session_state.prev_x = -12
+        st.session_state.curr_x = HERO_POSITIONS[0]
+        st.session_state.boss_hp = 100
+        st.session_state.action_state = "enter"
+        st.session_state.step_counter += 1
+        st.session_state.combat_log = f"⚔️ Hiệp sĩ bước vào khung hình Màn {st.session_state.stage}! Hãy tiếp tục giải toán để tiến lên!"
+        safe_rerun()
+    st.stop()
+
+# ================= HIỂN THỊ CÂU HỎI TOÁN HỌC =================
 current_q = current_stage["questions"][st.session_state.q_index]
-hero_sprite_html = render_sprite_html(HERO_FILES, "🤺")
-boss_sprite_html = render_sprite_html(current_stage["boss_files"], current_stage["boss_fallback"])
 
-st.markdown(f"""
-<div class="battle-arena" style="{bg_style}">
-    <div class="arena-overlay">
-        <div class="stage-banner">{current_stage["name"]}</div>
-        <p style="text-align:center; font-size:14px; color:#e0e0e0; margin-bottom:12px;">
-            <i>{current_stage["story"]}</i>
-        </p>
-        <div class="fighters-row">
-            <div class="fighter-box">
-                {hero_sprite_html}
-                <div style="font-weight:bold; margin-top:8px;">Hiệp Sĩ Giải Cứu Rồng</div>
-                <div class="hp-bar-bg">
-                    <div class="hp-bar-fill-hero" style="width: {st.session_state.hero_hp}%;"></div>
-                </div>
-                <small>❤️ 1 Mạng Tử Chiến | EXP: {st.session_state.score}</small>
-            </div>
-            <div class="vs-badge">⚔️ VS ⚔️</div>
-            <div class="fighter-box">
-                {boss_sprite_html}
-                <div style="font-weight:bold; margin-top:8px;">{current_stage["boss_name"]}</div>
-                <div class="hp-bar-bg">
-                    <div class="hp-bar-fill-boss" style="width: {st.session_state.boss_hp}%;"></div>
-                </div>
-                <small>HP Boss: {st.session_state.boss_hp}/100</small>
-            </div>
-        </div>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# Nhật ký chiến đấu & lời giải câu trước
-st.info(st.session_state.combat_log)
-if st.session_state.last_explanation:
-    with st.expander("📖 Xem lời giải chi tiết của đòn đánh vừa rồi", expanded=False):
-        st.markdown(st.session_state.last_explanation)
-
-# Hiển thị câu hỏi hiện tại
 st.markdown(f"""
 <div class="quest-card">
-    <h4>📜 {current_q["title"]} (Câu {st.session_state.q_index + 1}/5 của Màn {st.session_state.stage})</h4>
-    <p>{current_q["desc"]}</p>
+    <h4>📜 {current_q["title"]} (Bước {st.session_state.q_index + 1}/5 tại Màn {st.session_state.stage})</h4>
+    <p><i>{current_stage["story"]}</i></p>
+    <p><strong>Yêu cầu:</strong> {current_q["desc"]}</p>
 </div>
 """, unsafe_allow_html=True)
 
 st.latex(current_q["latex"])
 
 user_choice = st.radio(
-    "Chọn chiêu thức giải toán (Lưu ý: Sai 1 câu sẽ bị lính đánh chết ngay!):",
+    "Chọn đáp án đúng để Hiệp sĩ tiến lên phía trước và vung kiếm (Sai 1 câu sẽ bị lính đánh chết):",
     current_q["options"],
-    key=f"radio_q_{current_q['id']}"
+    key=f"q_radio_{current_q['id']}_{st.session_state.step_counter}"
 )
 
-if st.button("⚡ Vung Kiếm Tấn Công!", type="primary"):
+if st.button("⚡ Tiến Lên & Vung Kiếm Chém Boss!", type="primary"):
+    st.session_state.step_counter += 1
     st.session_state.last_explanation = f"**Đáp án đúng:** `{current_q['answer']}`\n\n**Lời giải chi tiết:** {current_q['explanation']}"
     
     if user_choice == current_q["answer"]:
         st.session_state.boss_hp -= 20
         st.session_state.score += 100
-        st.session_state.combat_log = f"💥 ĐÒN CHÍ MẠNG! Bạn chém trúng {current_stage['boss_name']} gây 20 sát thương!"
         
-        # Kiểm tra qua câu hoặc qua màn
+        # Nếu còn câu hỏi trong màn hiện tại -> Hiệp sĩ bước tới mốc tiếp theo trên khung hình
         if st.session_state.q_index + 1 < len(current_stage["questions"]):
+            st.session_state.prev_x = HERO_POSITIONS[st.session_state.q_index]
             st.session_state.q_index += 1
+            st.session_state.curr_x = HERO_POSITIONS[st.session_state.q_index]
+            st.session_state.action_state = "walk_attack"
+            st.session_state.combat_log = f"💥 CHÍNH XÁC! Hiệp sĩ tiến lên vị trí {st.session_state.curr_x}% khung hình và chém {current_stage['boss_name']} mất 20 HP!"
         else:
+            # Đã trả lời xong câu thứ 5 của màn
+            st.session_state.prev_x = HERO_POSITIONS[st.session_state.q_index]
             if st.session_state.stage < 3:
-                old_boss = current_stage["boss_name"]
-                st.session_state.stage += 1
-                st.session_state.q_index = 0
-                st.session_state.boss_hp = 100
-                st.session_state.combat_log = f"🔥 BẠN ĐÃ ĐÁNH BẠI {old_boss.upper()}! Tiến sang Màn {st.session_state.stage}!"
+                st.session_state.action_state = "stage_clear"
+                st.session_state.combat_log = f"🔥 {current_stage['boss_name'].upper()} ĐÃ GỤC NGÃ! Hiệp sĩ bước qua xác Boss, đi thẳng sang rìa phải khung hình để qua màn!"
             else:
-                st.session_state.victory = True
+                st.session_state.action_state = "victory"
+                st.session_state.combat_log = "👑 ĐÒN QUYẾT ĐỊNH! Công Chúa Độc Ác bị đánh bay lên trời và Rồng thần tung cánh bay đi!"
     else:
-        # Trả lời sai 1 câu -> Bị lính đánh chết ngay lập tức
-        st.session_state.hero_hp = 0
-        st.session_state.game_over = True
-    
+        # Trả lời sai -> Bị lính canh lao từ 2 bên khung hình vào kết liễu tại chỗ
+        st.session_state.action_state = "dead"
+        st.session_state.combat_log = "💀 SAI RỒI! Lính canh từ hai phía khung hình đã ập vào kết liễu Hiệp sĩ!"
+        
     safe_rerun()
