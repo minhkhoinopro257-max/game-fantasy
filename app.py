@@ -2,6 +2,19 @@ import streamlit as st
 import streamlit.components.v1 as components
 import base64
 import os
+import streamlit.components.v1 as components
+
+
+def get_base64_image(file_path):
+  if os.path.exists(file_path):
+    with open(file_path, 'rb') as f:
+      data = f.read()
+    return f"data:image/png;base64,{base64.b64encode(data).decode('utf-8')}"
+  return ''
+
+
+# Lấy chuỗi base64 chuẩn không bao giờ bị lỗi ngắt dòng
+hero_b64 = get_base64_image('hero.png')
 
 # Cấu hình trang
 st.set_page_config(
