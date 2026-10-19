@@ -148,4 +148,98 @@ st.markdown("""
 }
 @keyframes rushRight {
     0% { transform: translateX(-25px); }
-    100% { transform: translateX(10
+    100% { transform: translateX(10px) rotate(15deg); }
+}
+@keyframes rushLeft {
+    0% { transform: translateX(25px); }
+    100% { transform: translateX(-10px) rotate(-15deg); }
+}
+
+/* Hoạt họa Phá Đảo: Công chúa bị đánh bay & Rồng bay đi */
+.princess-blast-off {
+    animation: blastOff 3.5s forwards ease-in !important;
+}
+@keyframes blastOff {
+    0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+    30% { transform: translate(60px, -80px) rotate(360deg) scale(0.7); opacity: 0.9; }
+    100% { transform: translate(350px, -400px) rotate(1440deg) scale(0); opacity: 0; }
+}
+.dragon-fly-free {
+    font-size: 85px;
+    display: inline-block;
+    animation: dragonFly 4s infinite ease-in-out;
+}
+@keyframes dragonFly {
+    0% { transform: translate(-120px, 30px) scale(0.8); }
+    50% { transform: translate(20px, -35px) scale(1.15); }
+    100% { transform: translate(160px, -90px) scale(0.9); }
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ================= DỮ LIỆU 3 MÀN CHƠI & 15 CÂU HỎI =================
+HERO_FILES = ["main.png", "main.jpg", "image_b090fc.png"]
+
+STAGES = {
+    1: {
+        "name": "Màn 1: Tàn Tích Rừng Đen (Cơ bản)",
+        "story": "Tên Killer bất ngờ chặn đường!",
+        "boss_name": "Killer",
+        "boss_files": ["boss1.png", "boss1.jpg", "image_b09486.png"],
+        "boss_fallback": "🥷",
+        "bg_files": ["bg1.jpg", "bg1.png", "image_b0955a.jpg"],
+        "bg_fallback_gradient": "linear-gradient(180deg, #1b1b1b 0%, #3a3a3a 60%, #111111 100%)",
+        "questions": [
+            {
+                "id": 1,
+                "title": "Câu 1: Giải phương trình bậc hai",
+                "latex": r"x^2 - 5x + 6 = 0",
+                "desc": "Tìm tập nghiệm của phương trình trên:",
+                "options": ["x = 2 hoặc x = 3", "x = -2 hoặc x = -3", "x = 1 hoặc x = 6", "x = -1 hoặc x = 6"],
+                "answer": "x = 2 hoặc x = 3",
+                "explanation": "Ta có: $x^2 - 5x + 6 = 0 \\iff (x - 2)(x - 3) = 0 \\iff x = 2$ hoặc $x = 3$."
+            },
+            {
+                "id": 2,
+                "title": "Câu 2: Rút gọn biểu thức chứa căn",
+                "latex": r"A = \frac{\sqrt{12} + \sqrt{27} - \sqrt{3}}{\sqrt{3}}",
+                "desc": "Giá trị rút gọn của biểu thức A là:",
+                "options": ["4", "5", "3", "4√3"],
+                "answer": "4",
+                "explanation": "Vì $\\sqrt{12} = 2\\sqrt{3}$ và $\\sqrt{27} = 3\\sqrt{3}$, nên $A = \\frac{2\\sqrt{3} + 3\\sqrt{3} - \\sqrt{3}}{\\sqrt{3}} = \\frac{4\\sqrt{3}}{\\sqrt{3}} = 4$."
+            },
+            {
+                "id": 3,
+                "title": "Câu 3: Giải phương trình chứa ẩn ở mẫu",
+                "latex": r"\frac{2}{x-1} + \frac{1}{x+1} = 1 \quad (x \ne 1,\ x \ne -1)",
+                "desc": "Nghiệm của phương trình là:",
+                "options": [
+                    "x = (3 ± √17) / 2",
+                    "x = (3 ± √15) / 2",
+                    "x = 2 hoặc x = -1",
+                    "x = (-3 ± √17) / 2"
+                ],
+                "answer": "x = (3 ± √17) / 2",
+                "explanation": "Quy đồng khử mẫu: $2(x+1) + (x-1) = x^2 - 1 \\iff x^2 - 3x - 2 = 0$. Ta có $\\Delta = (-3)^2 - 4(1)(-2) = 17 > 0 \\implies x = \\frac{3 \\pm \\sqrt{17}}{2}$ (thỏa mãn ĐK)."
+            },
+            {
+                "id": 4,
+                "title": "Câu 4: Giải hệ phương trình bậc nhất hai ẩn",
+                "latex": r"\begin{cases} 2x + y = 7 \\ x - y = 2 \end{cases}",
+                "desc": "Cặp nghiệm (x; y) của hệ phương trình là:",
+                "options": ["(3; 1)", "(2; 3)", "(4; -1)", "(3; -1)"],
+                "answer": "(3; 1)",
+                "explanation": "Cộng từng vế hai phương trình: $3x = 9 \\implies x = 3$. Thay $x = 3$ vào phương trình dưới: $3 - y = 2 \\implies y = 1$. Vậy nghiệm là $(3; 1)$."
+            },
+            {
+                "id": 5,
+                "title": "Câu 5: Bài toán thực tế hình học",
+                "latex": r"2(a + b) = 34, \quad a \cdot b = 60",
+                "desc": "Một hình chữ nhật có chu vi 34 cm và diện tích 60 cm². Tìm chiều dài a và chiều rộng b:",
+                "options": [
+                    "Chiều dài 12 cm, chiều rộng 5 cm",
+                    "Chiều dài 10 cm, chiều rộng 6 cm",
+                    "Chiều dài 15 cm, chiều rộng 4 cm",
+                    "Chiều dài 14 cm, chiều rộng 3 cm"
+                ],
+                "answer": "Chiều dài
