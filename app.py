@@ -854,3 +854,9 @@ if st.button("⚡ Move Forward & Swing Sword!", type="primary"):
       st.session_state.curr_x = HERO_POSITIONS[st.session_state.q_index]
       st.session_state.action_state = "walk_attack"
       st.session_state.combat
+st.markdown("""
+<div class="actor-container">
+    <div class="actor-label">Hiệp Sĩ</div>
+    <img src="data:image/png;base64,..." />
+</div>
+""", unsafe_allow_html=True)
