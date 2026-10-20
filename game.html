@@ -1,0 +1,99 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hiệp Sĩ Giải Cứu Rồng</title>
+<style>
+body {
+    margin: 0;
+    background: #0d1018;
+    color: white;
+    font-family: Arial, sans-serif;
+}
+.game {
+    max-width: 850px;
+    margin: 20px auto;
+    border: 3px solid #ffdc00;
+    border-radius: 16px;
+    overflow: hidden;
+}
+.header {
+    padding: 18px;
+    background: #141824;
+    border-bottom: 3px solid #ffdc00;
+}
+.row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+h3 { margin: 0 0 12px; }
+.yellow { color: #ffdc00; }
+.bar {
+    height: 14px;
+    background: #333;
+    border-radius: 20px;
+    overflow: hidden;
+}
+.hp {
+    height: 100%;
+    width: 100%;
+    background: #ff3155;
+}
+.scene {
+    min-height: 300px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: linear-gradient(#242832, #090a0d);
+}
+.hero {
+    text-align: center;
+    font-size: 60px;
+}
+.label {
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+.path {
+    height: 8px;
+    margin: 20px 9%;
+    background: #6f6000;
+    border-radius: 10px;
+}
+</style>
+</head>
+<body>
+<div class="game">
+  <div class="header">
+    <div class="row">
+      <div>
+        <h3>⚔️ Hiệp Sĩ Giải Cứu Rồng (Bước 1/5)</h3>
+        <p>❤️ 1 Mạng Tử Chiến | Điểm: 0 EXP</p>
+      </div>
+      <div>
+        <h3>Sát Thủ Áo Đen</h3>
+        <div class="bar"><div class="hp"></div></div>
+        <p>HP Boss: 100/100</p>
+      </div>
+    </div>
+    <h3 class="yellow">Màn 1: Tàn Tích Rừng Đen (Cơ bản)</h3>
+  </div>
+  <div class="scene">
+    <div class="hero">
+      <div class="label">Hiệp Sĩ</div>
+      🛡️
+    </div>
+    <div class="hero">
+      <div class="label">Sát Thủ Áo Đen</div>
+      🥷
+    </div>
+  </div>
+  <div class="path"></div>
+</div>
+</body>
+</html>
